@@ -1,17 +1,26 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, Dimensions, View} from 'react-native';
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
+import firebase from 'react-native-firebase';
 
 const config = {
     velocityThreshold: 0.5,
     directionalOffsetThreshold: 80
   };
 
+  const { height, width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
     container: {
       flex: 1,
       alignItems: 'stretch',
+      backgroundColor: 'yellow',
     },
+    zadokaImage: {
+        flex: 1,
+        height: height,
+        width: width,
+    }
   });
 
 export default class HomeScreen extends Component {
@@ -19,21 +28,36 @@ export default class HomeScreen extends Component {
         super(props);
 
         this.state = {
-            swiped: undefined
+            swiped: undefined,
+            dailyUrl: undefined,
         }
     }
 
+    async getImageUrlFromFirebase() {
+        const ref = firebase.storage().ref('daily/00000D76_Perfect_skin.jpg');
+        const url = await ref.getDownloadURL();
+        return url;
+    }
+
     onSwipeLeft() {
-        this.setState({swiped: 'Swiped Left'});
+        this.getImageUrlFromFirebase().then((url) => this.setState({dailyUrl: url}));    
     }
 
     onSwipeRight() {
-        this.setState({swiped: 'Swiped Right'});
+        this.getImageUrlFromFirebase().then((url) => this.setState({dailyUrl: url}));    
     }
 
-    renderSwiped() {
-        if(this.state.swiped) {
-            return (<Text>{this.state.swiped}</Text>);
+    renderDailyZadoka() {
+        if(this.state.dailyUrl) {
+            console.log(this.state.dailyUrl)
+            return (<Image source={{uri: this.state.dailyUrl}} style={styles.zadokaImage}></Image>);
+        }
+        else{
+            return(
+                <View style={styles.container}>
+                    <Text>Zadoka is alive</Text>
+                    <Text>Swipe to test</Text>
+                </View>)
         }
     }
 
@@ -44,9 +68,7 @@ export default class HomeScreen extends Component {
                 onSwipeLeft={() => this.onSwipeLeft()}
                 onSwipeRight={() => this.onSwipeRight()}
                 config={config}>
-                    <Text>Zadoka is alive</Text>
-                    <Text>Swipe to test</Text>
-                    {this.renderSwiped()}
+                    {this.renderDailyZadoka()}
             </GestureRecognizer>
         );
     }
