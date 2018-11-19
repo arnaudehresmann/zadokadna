@@ -9,7 +9,8 @@
   "dependencies": {
     "react": "16.6.1",
     "react-native": "0.57.5",
-    "react-native-firebase": "^5.1.0"
+    "react-native-firebase": "^5.1.0",
+    "react-native-swipe-gestures": "^1.0.2"
   },
   "devDependencies": {
     "babel-jest": "23.6.0",
