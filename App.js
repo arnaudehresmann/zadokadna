@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import HomeScreen from "./app/screens/HomeScreen";
+import AppContainer from "./app/navigation/AppNavigation";
 
 export default class App extends Component {
   render() {
     return (
-      <HomeScreen></HomeScreen>
+      <AppContainer></AppContainer>
     );
   }
 }
