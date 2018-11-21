@@ -6,7 +6,7 @@ import * as DateHelper from '../utils/Date'
 import zadokaFirebase from '../utils/Firebase';
 
 const config = {
-    velocityThreshold: 0.5,
+    velocityThreshold: 0.3,
     directionalOffsetThreshold: 80
   };
 
@@ -16,7 +16,6 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       alignItems: 'stretch',
-      backgroundColor: 'yellow',
     },
     zadokaImage: {
         flex: 1,
@@ -41,24 +40,30 @@ export default class HomeScreen extends Component {
     }
 
     swipe(dateChanger) {
+        console.log("swipe");
         const currentDate = this.state.currentDate;
+        console.log("swipe currentDate:"+ currentDate);
         const newDate = dateChanger(currentDate);
+        console.log("swipe newDate:"+ newDate);
         this.setState({currentDate: newDate});
-        zadokaFirebase.getZadokaUrl(DateHelper.toZadokaDate(newDate)).then((url) => this.setState({dailyUrl: url}));    
+        console.log("swipe zadokadate:"+ DateHelper.toZadokaDate(newDate));
+        zadokaFirebase.getZadokaUrl(DateHelper.toZadokaDate(newDate)).then((url) => { console.log("swipe url:"+url);this.setState({dailyUrl: url});});    
 
     }
     onSwipeLeft() {
+        console.log("onSwipeLeft");
         this.swipe(DateHelper.incDays);
     }
 
     onSwipeRight() {
+        console.log("onSwipeRight");
         this.swipe(DateHelper.decDays);
     }
 
     renderDailyZadoka() {
         if(this.state.dailyUrl) {
             console.log(this.state.dailyUrl)
-            return (<Image source={{uri: this.state.dailyUrl}} style={styles.zadokaImage}></Image>);
+            return (<Image source={{uri: this.state.dailyUrl}} style={styles.zadokaImage} resizeMode="contain" resizeMethod="scale"></Image>);
         }
         else{
             return(
