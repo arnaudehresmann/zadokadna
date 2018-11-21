@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {Image, StyleSheet, Text, Dimensions, View} from 'react-native';
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import firebase from 'react-native-firebase';
+import * as DateHelper from '../utils/Date'
+import zadokaFirebase from '../utils/Firebase';
 
 const config = {
     velocityThreshold: 0.5,
@@ -35,48 +37,22 @@ export default class HomeScreen extends Component {
     }
 
     componentDidMount() {
-        //this.getImageUrlFromFirebase(this.toZadokaDate(new Date())).then((url) => this.setState({dailyUrl: url}));    
+        //zadokaFirebase.getZadokaUrl(DateHelper.toZadokaDate(new Date())).then((url) => this.setState({dailyUrl: url}));    
     }
 
-    toZadokaDate(date) {
-        return date.getFullYear().toString() 
-            + ("0"+(date.getMonth()+1)).slice(-2) 
-            + ("0" + date.getDate()).slice(-2);
-    }
-
-    async getPathFromZadokDay(zadokaDay) {
-        console.log("getPathFromZadokDay(" + zadokaDay + ")");
-        const doc = await firebase.firestore().doc('daily/' + zadokaDay).get();
-        return doc.get('path');
-    }
-
-    addDays(date, days) {
-        var result = new Date(date);
-        result.setDate(result.getDate() + days);
-        return result;
-    }
-
-    async getImageUrlFromFirebase(zadokaDay) {
-        console.log("getImageUrlFromFirebase("+zadokaDay+")");
-        const path = await this.getPathFromZadokDay(zadokaDay);
-        console.log("getImageUrlFromFirebase path:" + path);
-        const ref = firebase.storage().ref(path);
-        const url = await ref.getDownloadURL();
-        return url;
-    }
-
-    onSwipeLeft() {
+    swipe(dateChanger) {
         const currentDate = this.state.currentDate;
-        const newDate = this.addDays(currentDate, 1);
+        const newDate = dateChanger(currentDate);
         this.setState({currentDate: newDate});
-        this.getImageUrlFromFirebase(this.toZadokaDate(newDate)).then((url) => this.setState({dailyUrl: url}));    
+        zadokaFirebase.getZadokaUrl(DateHelper.toZadokaDate(newDate)).then((url) => this.setState({dailyUrl: url}));    
+
+    }
+    onSwipeLeft() {
+        this.swipe(DateHelper.incDays);
     }
 
     onSwipeRight() {
-        const currentDate = this.state.currentDate;
-        const newDate = this.addDays(currentDate, -1);
-        this.setState({currentDate: newDate});
-        this.getImageUrlFromFirebase().then((url) => this.setState({dailyUrl: url}));    
+        this.swipe(DateHelper.decDays);
     }
 
     renderDailyZadoka() {
