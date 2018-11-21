@@ -5,11 +5,16 @@ import HomeScreen from '../screens/HomeScreen';
 // Implementation of HomeScreen, OtherScreen, SignInScreen, AuthLoadingScreen
 // goes here.
 
+const HomeNavigator = createStackNavigator(
+  {
+    Home: HomeScreen,
+  }
+)
 
 export default createAppContainer(createSwitchNavigator(
   {
     Loading: LoadingScreen,
-    Home: HomeScreen,
+    Home: HomeNavigator,
   },
   {
     initialRouteName: 'Loading',

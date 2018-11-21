@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       alignItems: 'stretch',
+      backgroundColor: 'yellow'
     },
     zadokaImage: {
         flex: 1,
@@ -25,6 +26,16 @@ const styles = StyleSheet.create({
   });
 
 export default class HomeScreen extends Component {
+    static navigationOptions = {
+        title: 'ZadokaDna',
+    };
+
+    static navigationOptions = ({ navigation }) => {
+        return {
+          title: navigation.getParam('zadokaDay', DateHelper.toHeaderDate(new Date())),
+        };
+      };
+
     constructor(props) {
         super(props);
 
@@ -43,7 +54,9 @@ export default class HomeScreen extends Component {
         const currentDate = this.state.currentDate;
         const newDate = dateChanger(currentDate);
         this.setState({currentDate: newDate});
-        zadokaFirebase.getZadokaUrl(DateHelper.toZadokaDate(newDate)).then((url) => this.setState({dailyUrl: url}));    
+        zadokaFirebase.getZadokaUrl(DateHelper.toZadokaDate(newDate))
+            .then((url) => this.setState({dailyUrl: url}))
+            .then(() => this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(newDate)}));    
 
     }
     onSwipeLeft() {

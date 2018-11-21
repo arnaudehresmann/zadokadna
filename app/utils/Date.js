@@ -4,6 +4,11 @@ export function toZadokaDate(date) {
         + ("0" + date.getDate()).slice(-2);
 }
 
+export function toHeaderDate(date) {
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+    return date.toLocaleDateString('de-DE', options)
+}
+
 export function addDays(date, days) {
     var result = new Date(date);
     result.setDate(result.getDate() + days);
