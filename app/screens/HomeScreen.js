@@ -5,6 +5,7 @@ import firebase from 'react-native-firebase';
 import * as DateHelper from '../utils/Date'
 import zadokaFirebase from '../utils/Firebase';
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import Icon from "react-native-vector-icons/FontAwesome"
 
 const config = {
     velocityThreshold: 0.3,
