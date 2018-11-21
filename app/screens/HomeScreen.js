@@ -30,20 +30,52 @@ export default class HomeScreen extends Component {
         this.state = {
             swiped: undefined,
             dailyUrl: undefined,
+            currentDate: new Date(),        
         }
     }
 
-    async getImageUrlFromFirebase() {
-        const ref = firebase.storage().ref('daily/00000D76_Perfect_skin.jpg');
+    componentDidMount() {
+        //this.getImageUrlFromFirebase(this.toZadokaDate(new Date())).then((url) => this.setState({dailyUrl: url}));    
+    }
+
+    toZadokaDate(date) {
+        return date.getFullYear().toString() 
+            + ("0"+(date.getMonth()+1)).slice(-2) 
+            + ("0" + date.getDate()).slice(-2);
+    }
+
+    async getPathFromZadokDay(zadokaDay) {
+        console.log("getPathFromZadokDay(" + zadokaDay + ")");
+        const doc = await firebase.firestore().doc('daily/' + zadokaDay).get();
+        return doc.get('path');
+    }
+
+    addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+    }
+
+    async getImageUrlFromFirebase(zadokaDay) {
+        console.log("getImageUrlFromFirebase("+zadokaDay+")");
+        const path = await this.getPathFromZadokDay(zadokaDay);
+        console.log("getImageUrlFromFirebase path:" + path);
+        const ref = firebase.storage().ref(path);
         const url = await ref.getDownloadURL();
         return url;
     }
 
     onSwipeLeft() {
-        this.getImageUrlFromFirebase().then((url) => this.setState({dailyUrl: url}));    
+        const currentDate = this.state.currentDate;
+        const newDate = this.addDays(currentDate, 1);
+        this.setState({currentDate: newDate});
+        this.getImageUrlFromFirebase(this.toZadokaDate(newDate)).then((url) => this.setState({dailyUrl: url}));    
     }
 
     onSwipeRight() {
+        const currentDate = this.state.currentDate;
+        const newDate = this.addDays(currentDate, -1);
+        this.setState({currentDate: newDate});
         this.getImageUrlFromFirebase().then((url) => this.setState({dailyUrl: url}));    
     }
 
@@ -55,8 +87,7 @@ export default class HomeScreen extends Component {
         else{
             return(
                 <View style={styles.container}>
-                    <Text>Zadoka is alive</Text>
-                    <Text>Swipe to test</Text>
+                    <Text>No Zadoka for this day</Text>
                 </View>)
         }
     }
