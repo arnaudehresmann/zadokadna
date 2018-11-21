@@ -78,7 +78,11 @@ export default class HomeScreen extends Component {
 
     changeDate(date) {
         this.setState({currentDate: date})
-        zadokaFirebase.getZadokaUrl(DateHelper.toZadokaDate(date))
+        let zadokaDate = undefined;
+        if(date <= new Date()) {
+            zadokaDate = DateHelper.toZadokaDate(date);;
+        }
+        zadokaFirebase.getZadokaUrl(zadokaDate)
             .then((url) => this.setState({dailyUrl: url}))
             .then(() => this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(date), currentDate: date}));    
         this.hideCalendar();
@@ -91,11 +95,7 @@ export default class HomeScreen extends Component {
     swipe(dateChanger) {
         const currentDate = this.state.currentDate;
         const newDate = dateChanger(currentDate);
-        this.setState({currentDate: newDate});
-        zadokaFirebase.getZadokaUrl(DateHelper.toZadokaDate(newDate))
-            .then((url) => this.setState({dailyUrl: url}))
-            .then(() => this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(newDate), currentDate: newDate}));    
-
+        this.changeDate(newDate);
     }
     onSwipeLeft() {
         this.swipe(DateHelper.incDays);

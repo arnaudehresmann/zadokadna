@@ -29,9 +29,11 @@ class ZadokaFirebase {
 
     async getZadokaUrl(zadokaDay) {
         let url = undefined;
-        const path = await this.getZadokaPath(zadokaDay);
-        if(path) {
-            url = await this.getImageUrl(path);
+        if(zadokaDay) {
+            const path = await this.getZadokaPath(zadokaDay);
+            if(path) {
+                url = await this.getImageUrl(path);
+            }    
         }
         return url;
     }
