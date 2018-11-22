@@ -2,10 +2,12 @@ import React, {Component} from 'react';
 import {Image, StyleSheet, Text, Dimensions, View} from 'react-native';
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import firebase from 'react-native-firebase';
-import * as DateHelper from '../utils/Date'
+import * as DateHelper from '../utils/Date';
 import zadokaFirebase from '../utils/Firebase';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import Icon from "react-native-vector-icons/FontAwesome"
+import Icon from "react-native-vector-icons/FontAwesome";
+import RNFetchBlob from 'rn-fetch-blob';
+import ImageStore from '../utils/ImageStore';
 
 const config = {
     velocityThreshold: 0.3,
@@ -22,8 +24,8 @@ const styles = StyleSheet.create({
     },
     zadokaImage: {
         flex: 1,
-        height: height,
-        width: width,
+        height: undefined,
+        width: undefined,
     }
   });
   
@@ -79,12 +81,61 @@ export default class HomeScreen extends Component {
     changeDate(date) {
         this.setState({currentDate: date})
         let zadokaDate = undefined;
-        if(date <= new Date()) {
-            zadokaDate = DateHelper.toZadokaDate(date);;
+        if(date > new Date()) {
+            this.setState({dailyUrl: undefined});
+            this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(date), currentDate: date});
         }
-        zadokaFirebase.getZadokaUrl(zadokaDate)
-            .then((url) => this.setState({dailyUrl: url}))
-            .then(() => this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(date), currentDate: date}));    
+        else{
+            zadokaDate = DateHelper.toZadokaDate(date);
+            console.log("ImageStore.get("+zadokaDate+")");
+            ImageStore.get(zadokaDate)
+            .then((cachedUri) => {
+                if(cachedUri) {
+                    console.log("cachedUri :" + cachedUri);
+                    this.setState({dailyUrl: cachedUri});
+                    this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(date), currentDate: date});
+                }
+                else{
+                    zadokaFirebase.getZadokaUrl(zadokaDate)
+                    .then((url) => {
+                        if(url) {
+                            RNFetchBlob.config({
+                                fileCache: true,
+                            })
+                            .fetch('GET', url, {})
+                            .then((res) => {
+                                console.log("status :" + res.info().status);
+                                console.log("path :"+res.path())
+                                let status = res.info().status;
+                                if (status == 200) {
+                                    ImageStore.set(zadokaDate, 'file://' + res.path());
+                                    this.setState({dailyUrl: 'file://' + res.path()});
+                                    this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(date), currentDate: date});
+                                }
+                                else {
+                                    this.setState({dailyUrl: undefined});
+                                    this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(date), currentDate: date});                    
+                                }
+                            })
+                            .catch((errorMessage, statusCode) => {
+                                console.error(errorMessage);
+                                this.setState({dailyUrl: undefined});
+                                this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(date), currentDate: date});                    
+                            });                                
+                        }
+                        else {
+                            this.setState({dailyUrl: undefined});
+                            this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(date), currentDate: date});                    
+                        }
+                    });
+                }    
+            })    
+        }
+
+
+        // zadokaFirebase.getZadokaUrl(zadokaDate)
+        //     .then((url) => this.setState({dailyUrl: url}))
+        //     .then(() => this.props.navigation.setParams({zadokaDay: DateHelper.toHeaderDate(date), currentDate: date}));    
         this.hideCalendar();
     }
 
@@ -107,7 +158,13 @@ export default class HomeScreen extends Component {
 
     renderDailyZadoka() {
         if(this.state.dailyUrl) {
-            return (<Image source={{uri: this.state.dailyUrl}} style={styles.zadokaImage} resizeMode="contain" resizeMethod="scale"></Image>);
+            return (
+            <Image 
+                source={{uri: this.state.dailyUrl}} 
+                style={styles.zadokaImage} 
+                resizeMode='contain'
+                >
+            </Image>);
         }
         else{
             return(
