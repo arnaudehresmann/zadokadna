@@ -17,13 +17,12 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       alignItems: 'stretch',
-      backgroundColor: 'yellow'
     },
     zadokaImage: {
         flex: 1,
         height: undefined,
         width: undefined,
-    }
+    },
   });
   
 export default class HomeScreen extends Component {
@@ -114,11 +113,14 @@ export default class HomeScreen extends Component {
                 >
             </Image>);
         }
-        else{
+        else {
             return(
-                <View style={styles.container}>
-                    <Text>No Zadoka for this day</Text>
-                </View>)
+                <Image 
+                source={require('../assets/notAvailable.jpg')} 
+                style={styles.zadokaImage} 
+                resizeMode='contain'
+                >
+            </Image>)
         }
     }
 
