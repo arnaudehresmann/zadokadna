@@ -1,6 +1,6 @@
 {
   "name": "zadokadna",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
@@ -15,6 +15,7 @@
     "react-native-modal-datetime-picker": "^6.0.0",
     "react-native-swipe-gestures": "^1.0.2",
     "react-native-vector-icons": "^6.1.0",
+    "react-native-version-number": "^0.3.5",
     "react-navigation": "^3.0.0",
     "rn-fetch-blob": "^0.10.13"
   },
