@@ -1,9 +1,9 @@
-import { createSwitchNavigator, createStackNavigator, createAppContainer } from 'react-navigation';
+import React  from 'react';
+import { createSwitchNavigator, createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation';
 import LoadingScreen from '../screens/Loading';
 import HomeScreen from '../screens/HomeScreen';
-
-// Implementation of HomeScreen, OtherScreen, SignInScreen, AuthLoadingScreen
-// goes here.
+import SettingsScreen from '../screens/SettingsScreen'
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const HomeNavigator = createStackNavigator(
   {
@@ -11,10 +11,29 @@ const HomeNavigator = createStackNavigator(
   }
 )
 
+HomeNavigator.navigationOptions = {
+  tabBarIcon: ({ focused, horizontal, tintColor }) => {
+    return <Icon name='home' size={horizontal ? 20 : 25} color='black' />
+  }
+}
+
+const TabNavigator = createBottomTabNavigator({
+  Home: HomeNavigator,
+  Settings: {
+    screen : SettingsScreen,
+    navigationOptions: ({navigation}) => ({
+      tabBarIcon: ({ focused, horizontal, tintColor }) => {
+        return <Icon name='cogs' size={horizontal ? 20 : 25} color='black' />
+      }
+    }) 
+  }
+},
+);
+
 export default createAppContainer(createSwitchNavigator(
   {
     Loading: LoadingScreen,
-    Home: HomeNavigator,
+    TabNavigator: TabNavigator,
   },
   {
     initialRouteName: 'Loading',
