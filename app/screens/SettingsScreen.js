@@ -1,31 +1,26 @@
 import React from 'react'
-import { View, StyleSheet } from 'react-native'
-
+import { View, StyleSheet, Text, FlatList } from 'react-native'
+import Version from '../components/Version'
 export default class SettingsScreen extends React.Component {
-    static navigationOptions = ({ navigation }) => {
-        return {
-          title: navigation.getParam('zadokaDay', DateHelper.toHeaderDate(new Date())),
-          headerRight:(
-            <Icon.Button 
-                onPress={navigation.getParam('showCalendar')}
-                name="calendar" 
-                size={30} 
-                backgroundColor='transparent'
-                color="black" >
-                <DateTimePicker
-                date={navigation.getParam('currentDate', new Date())}
-                isVisible={navigation.getParam('isCalendarVisible', false)}
-                onConfirm={navigation.getParam('loadDate', () => {})}
-                onCancel={navigation.getParam('hideCalendar', () =>{})}
-              />
-            </Icon.Button>
-          ),
-        };
-      };
-      
+
     render() {
         return (
         <View style={styles.container}>
+            <FlatList style={styles.container}
+                data={[
+                    {
+                        key: '1', 
+                        render: () => {
+                            return (<View style={styles.item}>
+                                    <Text style={styles.itemHeader}>Version</Text>
+                                    <Version style={styles.versionNumber}></Version>
+                                </View>);
+                        }
+                    }
+                ]}
+                renderItem={({item}) => item.render()}
+            >
+            </FlatList>
         </View>
         )
     } 
@@ -35,4 +30,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  item: {
+      padding: 10,
+  },
+  versionNumber: {
+    fontSize: 18,
+    color: 'darkgrey',
+},
+  itemHeader: {
+      fontSize: 24,
+      fontWeight: 'bold',
+  }
 })
