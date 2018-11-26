@@ -14,11 +14,11 @@ class ImageLoader {
                     const response = await RNFetchBlob.config({
                         fileCache: true,
                     })
-                    .fetch('GET', url, {});
+                    .fetch('GET', zadokaUrl, {});
                     const status = response.info().status;
                     if(status == 200 )
                     {
-                        uri = 'file://' + res.path();
+                        uri = 'file://' + response.path();
                         ImageStore.set(zadokaDay, uri);
                     }                        
                 } catch (errorMessage) {
