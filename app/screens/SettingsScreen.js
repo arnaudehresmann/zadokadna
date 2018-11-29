@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, StyleSheet, Text, Platform, RefreshControl, Image, Switch } from 'react-native'
+import { View, StyleSheet, Text, Platform, RefreshControl, Image, TouchableOpacity } from 'react-native'
 import Version from '../components/Version'
 import * as SettingsScreenComponents from "react-native-settings-screen"
 import Icon from "react-native-vector-icons/Entypo";
@@ -10,6 +10,12 @@ const fontFamily = Platform.OS === 'ios' ? 'Avenir' : 'sans-serif';
 
 
 export default class SettingsScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: 'Settings',
+    };
+  };
+
     state = {
         refreshing: false,
         user: undefined,
@@ -25,23 +31,35 @@ export default class SettingsScreen extends React.Component {
         let userPicture = require('../assets/nouser.png');
         let userName = 'You are not logged in';
         let userEmail = '';
+        let isDisabled = false;
+
         if(this.state.user && !this.state.user.isAnonymous) {
           userPicture = require('../assets/splash.png');
           userName = this.state.user.displayName;
           userEmail = this.state.user.email;
+          isDisabled = true;
         }
         return (
-          <View style={styles.heroContainer}>
-            <Image source={userPicture} style={styles.userImage} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.userTitle}>{userName}</Text>
-              <Text style={styles.userEmail}>{userEmail}</Text>
+          <TouchableOpacity disabled={isDisabled} onPress={() => this.props.navigation.navigate('Login')}>
+            <View style={styles.heroContainer}>
+              <Image source={userPicture} style={styles.userImage} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.userTitle}>{userName}</Text>
+                <Text style={styles.userEmail}>{userEmail}</Text>
+              </View>
+                {this.renderChevron()}
             </View>
-          </View>);
+          </TouchableOpacity>);
+      }
+
+      renderChevron() {
+        if(!this.state.user || this.state.user.isAnonymous) {
+          return (<SettingsScreenComponents.Chevron />);
+        }
       }
 
       data = [
-        { type: 'CUSTOM_VIEW', key: 'user', render: this.renderUser },
+        { type: 'CUSTOM_VIEW', key: 'user', render: this.renderUser},
         // {
         //   type: 'SECTION',
         //   header: 'My Section'.toUpperCase(),
